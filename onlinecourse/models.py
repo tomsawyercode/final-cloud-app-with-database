@@ -95,25 +95,36 @@ class Enrollment(models.Model):
     rating = models.FloatField(default=5.0)
 
 
+# https://github.com/ibm-developer-skills-network/final-cloud-app-with-database/blob/master/onlinecourse/models.py
+
 # <HINT> Create a Question Model with:
     # Used to persist question content for a course
     # Has a One-To-Many (or Many-To-Many if you want to reuse questions) relationship with course
     # Has a grade point for each question
     # Has question content
     # Other fields and methods you would like to design
-#class Question(models.Model):
+
+class Question(models.Model):
     # Foreign key to lesson
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     # question text
+    question_text = models.TextField()
     # question grade/mark
+    grade =  models.IntegerField(default=0)
+ 
+    #course = models.ManyToManyField(Course)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+
+
 
     # <HINT> A sample model method to calculate if learner get the score of the question
-    #def is_get_score(self, selected_ids):
-    #    all_answers = self.choice_set.filter(is_correct=True).count()
-    #    selected_correct = self.choice_set.filter(is_correct=True, id__in=selected_ids).count()
-    #    if all_answers == selected_correct:
-    #        return True
-    #    else:
-    #        return False
+    def is_get_score(self, selected_ids):
+        all_answers = self.choice_set.filter(is_correct=True).count()
+        selected_correct = self.choice_set.filter(is_correct=True, id__in=selected_ids).count()
+        if all_answers == selected_correct:
+            return True
+        else:
+            return False
 
 
 #  <HINT> Create a Choice Model with:
@@ -122,13 +133,24 @@ class Enrollment(models.Model):
     # Choice content
     # Indicate if this choice of the question is a correct one or not
     # Other fields and methods you would like to design
-# class Choice(models.Model):
+
+class Choice(models.Model):
+
+     choice_text = models.TextField()
+     question_id = models.ForeignKey(Question, on_delete=models.CASCADE) 
+     is_correct= models.BooleanField()
+
+
 
 # <HINT> The submission model
-# One enrollment could have multiple submission
-# One submission could have multiple choices
+
+
 # One choice could belong to multiple submissions
-#class Submission(models.Model):
-#    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE)
-#    choices = models.ManyToManyField(Choice)
-#    Other fields and methods you would like to design
+
+class Submission(models.Model):
+    # One enrollment could have multiple submission    
+    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE) # original
+    # One submission could have multiple choices
+    choices = models.ManyToManyField(Choice) # original
+
+
